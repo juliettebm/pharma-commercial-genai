@@ -29,16 +29,30 @@ ROOT = Path(__file__).resolve().parent.parent
 DB_PATH = ROOT / "data" / "openpayments.sqlite"
 
 NUM_FEATURES = [
-    "n_payments", "total_amount", "mean_amount", "n_manufacturers", "n_natures",
+    "n_payments", "total_amount", "mean_amount", "median_amount", "n_manufacturers", "n_natures",
     "share_food", "share_travel", "share_consulting", "share_speaker", "share_education",
 ]
 CAT_FEATURES = ["specialty"]
 TARGET = "retenu"
 
+# Variables tres asymetriques (lois de puissance, cf. EDA notebook 01) :
+# on les passe en log1p avant tout clustering pour eviter qu'un seul HCP
+# extreme ne domine la distance euclidienne et n'isole un cluster degenere.
+SKEWED_FEATURES = ["n_payments", "total_amount", "mean_amount", "median_amount",
+                    "n_manufacturers", "n_natures"]
+
 
 def load() -> pd.DataFrame:
     with sqlite3.connect(DB_PATH) as con:
         return pd.read_sql("SELECT * FROM hcp_features", con)
+
+
+def scaled_features(df: pd.DataFrame) -> np.ndarray:
+    """Standardise NUM_FEATURES pour le clustering, avec log1p prealable
+    sur les variables asymetriques (decision EDA notebook 01)."""
+    X = df[NUM_FEATURES].fillna(0).copy()
+    X[SKEWED_FEATURES] = np.log1p(X[SKEWED_FEATURES])
+    return StandardScaler().fit_transform(X)
 
 
 def build_pipeline() -> Pipeline:
@@ -106,7 +120,7 @@ def shap_explanation(pipe: Pipeline, df: pd.DataFrame) -> None:
 
 
 def segmentation(df: pd.DataFrame, k: int = 4) -> None:
-    X = StandardScaler().fit_transform(df[NUM_FEATURES].fillna(0))
+    X = scaled_features(df)
     df = df.copy()
     df["segment"] = KMeans(n_clusters=k, n_init=10, random_state=0).fit_predict(X)
     print("\n=== Segmentation des profils d'engagement (k-means) ===")

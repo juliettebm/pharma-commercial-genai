@@ -22,10 +22,10 @@ Ce projet construit un système compact de bout en bout sur données publiques, 
 
 - **Source** : CMS Open Payments (États-Unis), public. General Payments.
 - **Périmètre** : Virginie-Occidentale, année de programme 2022 (variables) à 2023 (cible de rétention).
-- **Taille** : 5 707 PS ; 186 223 paiements bruts sur les deux années.
+- **Taille** : 5 707 PS ; 185 027 paiements après dédoublonnage (186 426 paiements bruts sur les deux années).
 - **Taux de base** : 73,3 % de rétention.
 - **Accès** : récupéré automatiquement depuis l'API de données CMS par `src/01_prepare_data.py` (aucun téléchargement manuel). Les données brutes et la base SQLite ne sont pas versionnées (voir `.gitignore`).
-- **Limite qualité connue** : les noms de laboratoires ne sont pas normalisés (« ABBVIE INC. » et « AbbVie Inc. » coexistent), ce qui biaise l'agrégation par entreprise. Signalé pour la gouvernance.
+- **Limite qualité identifiée et corrigée** : les noms de laboratoires présentaient plusieurs graphies (« ABBVIE INC. » vs « AbbVie Inc. »), ce qui aurait biaisé le comptage de laboratoires partenaires. Normalisés (`.str.upper().str.strip()`) avant agrégation ; 1 204 lignes strictement dupliquées (0,65 %) supprimées.
 
 ---
 
@@ -109,22 +109,22 @@ Périmètre : Virginie-Occidentale, 2022 à 2023, 5 707 PS, 73,3 % de rétention
 
 | Métrique | Valeur |
 | --- | --- |
-| ROC-AUC (Random Forest) | **0,807** |
+| ROC-AUC (Random Forest) | **0,805** |
 | ROC-AUC (baseline majoritaire) | 0,500 |
-| PR-AUC | 0,922 |
+| PR-AUC | 0,920 |
 
 Principaux facteurs (importances de variables et SHAP concordent) : nombre de paiements, nombre de laboratoires, montant total. La rétention est portée par l'intensité de l'engagement, pas par la spécialité.
 
-**Segments d'engagement (k-means) :**
+**Segments d'engagement (k-means, sur variables standardisées avec log1p sur les montants et comptes) :**
 
-| Segment | PS | Montant moyen | Paiements moyens | Rétention |
-| --- | ---: | ---: | ---: | ---: |
-| Cœur fidèle | 679 | 2 437 $ | 76 | **98 %** |
-| Forte valeur | 267 | 19 149 $ | 32 | 81 % |
-| Contact léger | 4 592 | 209 $ | 6 | 70 % |
-| Contact minimal | 169 | 172 $ | 1,6 | **56 %** |
+| Segment | PS | Montant moyen | Paiements moyens | Laboratoires moyens | Rétention |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Cœur fidèle | 1 630 | 756 $ | 39 | 9,8 | **96 %** |
+| Haute valeur | 181 | 27 597 $ | 60 | 6,8 | 87 % |
+| Valeur ponctuelle | 512 | 1 892 $ | 11 | 2,9 | 73 % |
+| Engagement minimal | 3 384 | 77 $ | 2,7 | 1,7 | **62 %** |
 
-**Fairness (AUC par spécialité) :** solide pour les grands groupes (médecins 0,808, PA/APN 0,802) mais nettement plus faible pour les Dental Providers (**0,633**), donc les prédictions ne sont pas appliquées uniformément.
+**Fairness (AUC par spécialité) :** solide pour les grands groupes (médecins 0,807, PA/APN 0,804) mais nettement plus faible pour les Dental Providers (**0,639**), donc les prédictions ne sont pas appliquées uniformément.
 
 ---
 

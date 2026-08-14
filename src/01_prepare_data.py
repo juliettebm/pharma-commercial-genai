@@ -93,7 +93,8 @@ def fetch_state_year(year: int, state: str) -> pd.DataFrame:
 # Nettoyage et contrôle qualité
 # --------------------------------------------------------------------------
 def clean(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
+    # Dedoublonnage strict (artefacts de reinjection identifies en EDA)
+    df = df.drop_duplicates().copy()
     df["total_amount_of_payment_usdollars"] = pd.to_numeric(
         df["total_amount_of_payment_usdollars"], errors="coerce"
     )
@@ -101,6 +102,10 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
     # Spécialité : on garde le niveau haut (avant le premier séparateur "|")
     df["specialty"] = (
         df["covered_recipient_specialty_1"].fillna("Unknown").str.split("|").str[0].str.strip()
+    )
+    # Normalisation des noms de laboratoires (casse/espaces incoherents en EDA)
+    df["applicable_manufacturer_or_applicable_gpo_making_payment_name"] = (
+        df["applicable_manufacturer_or_applicable_gpo_making_payment_name"].str.upper().str.strip()
     )
     # On ne garde que les professionnels identifiés (exclut les hôpitaux universitaires)
     df = df[df["covered_recipient_profile_id"].notna()]
@@ -127,20 +132,21 @@ def build_features(df_feat: pd.DataFrame, ids_target: set) -> pd.DataFrame:
         "n_payments": g.size(),
         "total_amount": g["total_amount_of_payment_usdollars"].sum(),
         "mean_amount": g["total_amount_of_payment_usdollars"].mean(),
+        "median_amount": g["total_amount_of_payment_usdollars"].median(),
         "n_manufacturers": g["applicable_manufacturer_or_applicable_gpo_making_payment_name"].nunique(),
         "n_natures": g["nature_of_payment_or_transfer_of_value"].nunique(),
         "specialty": g["specialty"].agg(lambda s: s.mode().iloc[0] if not s.mode().empty else "Unknown"),
         "state": g["recipient_state"].first(),
     })
-    # Part des natures de paiement les plus courantes
+    # Part de la VALEUR (montant) de chaque nature de paiement, pas du volume
     for nature, col in [("Food and Beverage", "share_food"),
                         ("Travel and Lodging", "share_travel"),
                         ("Consulting Fee", "share_consulting"),
                         ("Compensation for services other than consulting, including serving as faculty or as a speaker at a venue other than a continuing education program", "share_speaker"),
                         ("Education", "share_education")]:
         part = df_feat[df_feat["nature_of_payment_or_transfer_of_value"] == nature] \
-            .groupby("covered_recipient_profile_id").size()
-        feats[col] = (part / feats["n_payments"]).reindex(feats.index).fillna(0.0)
+            .groupby("covered_recipient_profile_id")["total_amount_of_payment_usdollars"].sum()
+        feats[col] = (part / feats["total_amount"]).reindex(feats.index).fillna(0.0)
     # Cible : présent (au moins un paiement) l'année suivante
     feats["retenu"] = feats.index.to_series().isin(ids_target).astype(int)
     return feats.reset_index()

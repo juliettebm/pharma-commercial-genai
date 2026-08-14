@@ -8,7 +8,7 @@ A model card documenting the retention model of this project, following the spir
 
 - **Task**: binary classification. Predict whether a healthcare professional (HCP) who received at least one industry payment in year N will still receive any payment in year N+1 (retention / churn).
 - **Algorithm**: Random Forest (300 trees, balanced class weights), with standardised numeric features and one-hot encoded specialty.
-- **Features** (year N engagement profile): number of payments, total and mean amount, number of distinct manufacturers, number of payment natures, share of payment types (food, travel, consulting, speaker, education), specialty.
+- **Features** (year N engagement profile): number of payments, total, mean and median amount, number of distinct manufacturers, number of payment natures, share of payment value by type (food, travel, consulting, speaker, education), specialty.
 - **Target**: presence of any payment in year N+1.
 
 ## Intended use
@@ -20,17 +20,17 @@ A model card documenting the retention model of this project, following the spir
 
 - **Source**: CMS Open Payments (US), public. General Payments.
 - **Scope**: state of West Virginia, program year 2022 (features) to 2023 (target).
-- **Size**: 5,707 HCPs; 186,223 raw payments across the two years.
+- **Size**: 5,707 HCPs; 185,027 cleaned payments across the two years (186,426 raw; 1,204 strict duplicates, 0.65%, removed).
 - **Base rate**: 73.3% retention.
-- **Known data-quality gap**: manufacturer names are **not normalised** (for example "ABBVIE INC." and "AbbVie Inc." coexist), which biases any company-level aggregation. Flagged for governance and remediation.
+- **Data-quality gap identified and corrected**: manufacturer names had inconsistent casing/spacing (for example "ABBVIE INC." and "AbbVie Inc."), which would have biased company-level aggregation and the `n_manufacturers` feature. Normalised (`.str.upper().str.strip()`) before aggregation.
 
 ## Metrics
 
 | Metric | Value |
 | --- | --- |
-| ROC-AUC (Random Forest) | **0.807** |
+| ROC-AUC (Random Forest) | **0.805** |
 | ROC-AUC (majority baseline) | 0.500 |
-| PR-AUC | 0.922 |
+| PR-AUC | 0.920 |
 
 Main drivers (feature importance and SHAP agree): **number of payments, number of manufacturers, total amount**. Retention is driven by engagement intensity, not by specialty.
 
@@ -40,13 +40,13 @@ Out-of-fold performance by specialty (5-fold), the core fairness check:
 
 | Specialty | n | Retention | AUC |
 | --- | ---: | ---: | ---: |
-| Allopathic & Osteopathic Physicians | 2852 | 0.72 | 0.808 |
-| Physician Assistants & Advanced Practice Nursing | 2272 | 0.77 | 0.802 |
-| Dental Providers | 358 | 0.61 | **0.633** |
-| Eye and Vision Services | 158 | 0.85 | 0.799 |
-| Podiatric Medicine & Surgery | 57 | 0.82 | 0.891 |
+| Allopathic & Osteopathic Physicians | 2852 | 0.72 | 0.807 |
+| Physician Assistants & Advanced Practice Nursing | 2272 | 0.77 | 0.804 |
+| Dental Providers | 358 | 0.61 | **0.639** |
+| Eye and Vision Services | 158 | 0.85 | 0.808 |
+| Podiatric Medicine & Surgery | 57 | 0.82 | 0.898 |
 
-**Finding**: performance is strong and consistent for the two large groups (AUC around 0.80) but **markedly weaker for Dental Providers (AUC 0.633)**. The model must therefore not be applied uniformly across specialties; predictions for under-served groups need a lower-confidence flag or a group-specific model.
+**Finding**: performance is strong and consistent for the two large groups (AUC around 0.80) but **markedly weaker for Dental Providers (AUC 0.639)**. The model must therefore not be applied uniformly across specialties; predictions for under-served groups need a lower-confidence flag or a group-specific model.
 
 ## Ethical considerations
 

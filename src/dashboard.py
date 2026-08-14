@@ -18,7 +18,6 @@ import streamlit as st
 from sklearn.cluster import KMeans
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 
 SRC = Path(__file__).resolve().parent
 ROOT = SRC.parent
@@ -75,7 +74,7 @@ left, right = st.columns(2)
 
 with left:
     st.subheader("Segments d'engagement (k-means)")
-    Xs = StandardScaler().fit_transform(df[modeling.NUM_FEATURES].fillna(0))
+    Xs = modeling.scaled_features(df)
     d = df.copy()
     d["segment"] = KMeans(n_clusters=4, n_init=10, random_state=0).fit_predict(Xs)
     seg = d.groupby("segment").agg(
