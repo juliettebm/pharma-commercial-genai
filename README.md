@@ -1,4 +1,4 @@
-# 💊 Pharma Commercial Analytics + GenAI
+# 💊 Analytics commercial pharmaceutique + GenAI
 
 [![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-Random%20Forest-orange?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
@@ -6,48 +6,48 @@
 [![Streamlit](https://img.shields.io/badge/Streamlit-dashboard-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-End-to-end commercial data science on real pharmaceutical marketing data (CMS Open Payments): HCP retention modeling with SHAP, engagement segmentation, a GenAI text-to-SQL assistant, an interactive dashboard, and a responsible-AI model card.
+Data science commerciale de bout en bout sur des données marketing pharmaceutiques réelles (CMS Open Payments) : modèle de rétention des professionnels de santé avec SHAP, segmentation de l'engagement, assistant GenAI text-to-SQL, tableau de bord interactif et model card d'IA responsable.
 
 ---
 
-## Objective
+## Objectif
 
-Pharmaceutical companies spend heavily engaging healthcare professionals (HCPs). Commercial teams need to understand and segment that engagement, predict which HCPs stay engaged from one year to the next, let non-technical stakeholders explore the data in plain language, and do all of it under responsible-AI constraints.
+Les laboratoires pharmaceutiques investissent massivement dans l'engagement des professionnels de santé (PS). Les équipes commerciales ont besoin de comprendre et de segmenter cet engagement, de prédire quels PS restent engagés d'une année à l'autre, de laisser des interlocuteurs non techniques explorer les données en langage clair, et de faire tout cela sous contrainte d'IA responsable.
 
-This project builds a compact end-to-end system on public data that mirrors the missions of a pharma Commercial Data Science role: cleaning and structuring, predictive modeling and evaluation, GenAI and conversational analytics, data storytelling, and AI governance.
-
----
-
-## Dataset
-
-- **Source**: CMS Open Payments (US), public. General Payments.
-- **Scope**: West Virginia, program year 2022 (features) to 2023 (retention target).
-- **Size**: 5,707 HCPs; 186,223 raw payments across the two years.
-- **Base rate**: 73.3% retention.
-- **Access**: pulled automatically from the CMS data API by `src/01_prepare_data.py` (no manual download). The raw data and the SQLite database are not versioned (see `.gitignore`).
-- **Known data-quality gap**: manufacturer names are not normalised ("ABBVIE INC." and "AbbVie Inc." coexist), which biases company-level aggregation. Flagged for governance.
+Ce projet construit un système compact de bout en bout sur données publiques, qui reflète les missions d'un poste de Data Science commerciale en pharma : nettoyage et structuration, modélisation prédictive et évaluation, GenAI et analytique conversationnelle, data storytelling et gouvernance de l'IA.
 
 ---
 
-## Project Structure
+## Jeu de données
+
+- **Source** : CMS Open Payments (États-Unis), public. General Payments.
+- **Périmètre** : Virginie-Occidentale, année de programme 2022 (variables) à 2023 (cible de rétention).
+- **Taille** : 5 707 PS ; 186 223 paiements bruts sur les deux années.
+- **Taux de base** : 73,3 % de rétention.
+- **Accès** : récupéré automatiquement depuis l'API de données CMS par `src/01_prepare_data.py` (aucun téléchargement manuel). Les données brutes et la base SQLite ne sont pas versionnées (voir `.gitignore`).
+- **Limite qualité connue** : les noms de laboratoires ne sont pas normalisés (« ABBVIE INC. » et « AbbVie Inc. » coexistent), ce qui biaise l'agrégation par entreprise. Signalé pour la gouvernance.
+
+---
+
+## Structure du projet
 
 ```
 pharma-commercial-genai/
 │
 ├── data/
-│   └── README.md                   # data source and download notes (raw data not versioned)
-├── notebooks/                      # interactive analysis (open, run and modify in Jupyter/VS Code)
-│   ├── 01_exploration.ipynb        # EDA: load raw data, observe, and preparation decisions
-│   ├── 02_preparation.ipynb        # apply the decisions: clean, aggregate, retention target
-│   ├── 03_modeling.ipynb           # retention model, SHAP, segmentation, fairness
-│   └── 04_genai_assistant.ipynb    # text-to-SQL assistant
+│   └── README.md                   # source des données et notes de récupération (données brutes non versionnées)
+├── notebooks/                      # analyse interactive (à ouvrir, exécuter et modifier dans Jupyter/VS Code)
+│   ├── 01_exploration.ipynb        # EDA : chargement des données brutes, observation, décisions de préparation
+│   ├── 02_preparation.ipynb        # application des décisions : nettoyage, agrégation, cible de rétention
+│   ├── 03_modeling.ipynb           # modèle de rétention, SHAP, segmentation, fairness
+│   └── 04_genai_assistant.ipynb    # assistant text-to-SQL
 ├── src/
-│   ├── 01_prepare_data.py          # pull from CMS API, clean, quality audit, build SQLite
-│   ├── 02_modeling.py              # retention model, SHAP, segmentation, fairness check
-│   ├── 03_genai_assistant.py       # text-to-SQL assistant over a semantic view
-│   └── dashboard.py                # Streamlit: KPIs, segments, model, assistant
+│   ├── 01_prepare_data.py          # récupération API CMS, nettoyage, audit qualité, construction SQLite
+│   ├── 02_modeling.py              # modèle de rétention, SHAP, segmentation, contrôle de fairness
+│   ├── 03_genai_assistant.py       # assistant text-to-SQL sur une vue sémantique
+│   └── dashboard.py                # Streamlit : KPIs, segments, modèle, assistant
 ├── responsible_ai/
-│   └── model_card.md               # metrics, fairness, ethics, governance, GDPR
+│   └── model_card.md               # métriques, fairness, éthique, gouvernance, RGPD
 ├── requirements.txt
 ├── .gitignore
 └── README.md
@@ -55,88 +55,88 @@ pharma-commercial-genai/
 
 ---
 
-## Reproduce
+## Reproduire
 
-### 1. Clone
+### 1. Cloner
 
 ```bash
 git clone https://github.com/juliettebm/pharma-commercial-genai.git
 cd pharma-commercial-genai
 ```
 
-### 2. Install
+### 2. Installer
 
 ```bash
 python -m venv .venv
-.venv\Scripts\activate            # Linux/macOS: source .venv/bin/activate
+.venv\Scripts\activate            # Linux/macOS : source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Build the dataset (CMS API)
+### 3. Construire le jeu de données (API CMS)
 
 ```bash
-python src/01_prepare_data.py       # downloads a state slice and builds data/openpayments.sqlite
+python src/01_prepare_data.py       # télécharge une tranche d'un État et construit data/openpayments.sqlite
 ```
 
-### 4. Model, assistant, dashboard
+### 4. Modèle, assistant, tableau de bord
 
 ```bash
-python src/02_modeling.py                       # retention model + SHAP + segmentation + fairness
+python src/02_modeling.py                       # modèle de rétention + SHAP + segmentation + fairness
 python src/03_genai_assistant.py "Combien de professionnels de sante en 2023 ?"
-streamlit run src/dashboard.py                  # interactive dashboard
+streamlit run src/dashboard.py                  # tableau de bord interactif
 ```
 
-The GenAI assistant needs a local LLM. Install Ollama, run `ollama pull llama3.2`, and keep the app running (or set `LLM_PROVIDER=openai` with an API key).
+L'assistant GenAI a besoin d'un LLM local. Installez Ollama, lancez `ollama pull llama3.2` et gardez l'application en marche (ou définissez `LLM_PROVIDER=openai` avec une clé API).
 
-The same steps are available as interactive notebooks in [`notebooks/`](notebooks/) (01 to 03), to open, run and modify in Jupyter or VS Code.
-
----
-
-## Methodology
-
-1. **Data preparation**: paginated pull from the CMS data API for one state and two years, cleaning, quality audit, aggregation to an HCP engagement profile, and a relational SQLite database.
-2. **Retention model**: Random Forest predicting whether an HCP engaged in year N is still engaged in year N+1. Temporal separation of features and target avoids leakage.
-3. **Explainability**: SHAP values on top of feature importances.
-4. **Segmentation**: k-means on engagement profiles.
-5. **GenAI assistant**: a natural-language question is translated to SQL over a semantic view with short column names, executed, and narrated. Guardrails allow SELECT only.
-6. **Responsible AI**: fairness sliced by specialty, plus a model card covering governance and GDPR.
+Les mêmes étapes sont disponibles sous forme de notebooks interactifs dans [`notebooks/`](notebooks/) (01 à 03), à ouvrir, exécuter et modifier dans Jupyter ou VS Code.
 
 ---
 
-## Key Results
+## Méthodologie
 
-Scope: West Virginia, 2022 to 2023, 5,707 HCPs, 73.3% retention.
+1. **Préparation des données** : récupération paginée depuis l'API de données CMS pour un État et deux années, nettoyage, audit qualité, agrégation en un profil d'engagement par PS, et base de données relationnelle SQLite.
+2. **Modèle de rétention** : Random Forest prédisant si un PS engagé en année N l'est encore en année N+1. La séparation temporelle des variables et de la cible évite les fuites.
+3. **Explicabilité** : valeurs SHAP en complément des importances de variables.
+4. **Segmentation** : k-means sur les profils d'engagement.
+5. **Assistant GenAI** : une question en langage naturel est traduite en SQL sur une vue sémantique aux noms de colonnes courts, exécutée, puis reformulée. Les garde-fous n'autorisent que le SELECT.
+6. **IA responsable** : fairness découpée par spécialité, plus une model card couvrant la gouvernance et le RGPD.
 
-| Metric | Value |
+---
+
+## Résultats clés
+
+Périmètre : Virginie-Occidentale, 2022 à 2023, 5 707 PS, 73,3 % de rétention.
+
+| Métrique | Valeur |
 | --- | --- |
-| ROC-AUC (Random Forest) | **0.807** |
-| ROC-AUC (majority baseline) | 0.500 |
-| PR-AUC | 0.922 |
+| ROC-AUC (Random Forest) | **0,807** |
+| ROC-AUC (baseline majoritaire) | 0,500 |
+| PR-AUC | 0,922 |
 
-Main drivers (feature importance and SHAP agree): number of payments, number of manufacturers, total amount. Retention is driven by engagement intensity, not specialty.
+Principaux facteurs (importances de variables et SHAP concordent) : nombre de paiements, nombre de laboratoires, montant total. La rétention est portée par l'intensité de l'engagement, pas par la spécialité.
 
-**Engagement segments (k-means):**
+**Segments d'engagement (k-means) :**
 
-| Segment | HCPs | Mean amount | Mean payments | Retention |
+| Segment | PS | Montant moyen | Paiements moyens | Rétention |
 | --- | ---: | ---: | ---: | ---: |
-| Loyal core | 679 | $2,437 | 76 | **98%** |
-| High value | 267 | $19,149 | 32 | 81% |
-| Low touch | 4,592 | $209 | 6 | 70% |
-| Minimal contact | 169 | $172 | 1.6 | **56%** |
+| Cœur fidèle | 679 | 2 437 $ | 76 | **98 %** |
+| Forte valeur | 267 | 19 149 $ | 32 | 81 % |
+| Contact léger | 4 592 | 209 $ | 6 | 70 % |
+| Contact minimal | 169 | 172 $ | 1,6 | **56 %** |
 
-**Fairness (AUC by specialty):** strong for the large groups (physicians 0.808, PA/APN 0.802) but markedly weaker for Dental Providers (**0.633**), so predictions are not applied uniformly.
-
----
-
-## Responsible AI
-
-Profiling HCPs by commercial value is sensitive, so the project treats it explicitly: SHAP transparency, a fairness slice that surfaced the Dental Providers gap, documented limitations and leakage controls, and a data-governance / GDPR note. Summarised in [`responsible_ai/model_card.md`](responsible_ai/model_card.md).
+**Fairness (AUC par spécialité) :** solide pour les grands groupes (médecins 0,808, PA/APN 0,802) mais nettement plus faible pour les Dental Providers (**0,633**), donc les prédictions ne sont pas appliquées uniformément.
 
 ---
 
-## Disclaimer
+## IA responsable
 
-Educational proof-of-concept on public data concerning real individuals (physicians). Used for analysis and demonstration only, not for individual targeting decisions.
+Profiler les PS selon leur valeur commerciale est sensible, le projet le traite donc explicitement : transparence SHAP, un découpage de fairness qui a révélé l'écart des Dental Providers, des limites et des contrôles de fuite documentés, et une note de gouvernance des données / RGPD. Synthèse dans [`responsible_ai/model_card.md`](responsible_ai/model_card.md).
+
+---
+
+## Avertissement
+
+Preuve de concept pédagogique sur données publiques concernant des individus réels (médecins). Utilisée à des fins d'analyse et de démonstration uniquement, pas pour des décisions de ciblage individuel.
 
 ---
 
@@ -146,13 +146,13 @@ Python 3.11 · pandas · scikit-learn · SHAP · SQLite · LangChain · Streamli
 
 ---
 
-## License
+## Licence
 
-Released under the [MIT License](LICENSE).
+Publié sous [licence MIT](LICENSE).
 
 ---
 
-## Author
+## Autrice
 
 **Juliette Bouli-Mengue**
-Clinical Research to Data Science
+De la recherche clinique à la data science
