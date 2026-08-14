@@ -73,7 +73,11 @@ def get_llm(temperature: float = 0.0):
 def extract_sql(text: str) -> str:
     text = re.sub(r"```(?:sql)?", "", text, flags=re.IGNORECASE).strip("` \n")
     m = re.search(r"(?is)\bselect\b.*", text)
-    return (m.group(0) if m else text).strip().rstrip(";").strip()
+    sql = m.group(0) if m else text
+    # coupe au premier marqueur de fin de requete (le LLM ajoute parfois une
+    # explication apres le SQL, dont un ';' qui ferait echouer le garde-fou is_safe)
+    sql = re.split(r";|```|\n\s*\n", sql)[0]
+    return sql.strip()
 
 
 def is_safe(sql: str) -> bool:
