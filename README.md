@@ -128,6 +128,18 @@ Principaux facteurs (importances de variables et SHAP concordent) : nombre de pa
 
 ---
 
+## Dashboard
+
+Un tableau de bord Streamlit restitue les résultats aux équipes commerciales : KPIs, segments d'engagement, performance et importances du modèle, et l'assistant conversationnel, le tout dans une interface unique sans code.
+
+![Aperçu du dashboard Streamlit](docs/dashboard.png)
+
+```bash
+streamlit run src/dashboard.py
+```
+
+---
+
 ## IA responsable
 
 Profiler les PS selon leur valeur commerciale est sensible, le projet le traite donc explicitement : transparence SHAP, un découpage de fairness qui a révélé l'écart des Dental Providers, des limites et des contrôles de fuite documentés, et une note de gouvernance des données / RGPD. Synthèse dans [`responsible_ai/model_card.md`](responsible_ai/model_card.md).
