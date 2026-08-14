@@ -37,8 +37,8 @@ pharma-commercial-genai/
 ├── data/
 │   └── README.md                   # data source and download notes (raw data not versioned)
 ├── notebooks/                      # interactive analysis (open, run and modify in Jupyter/VS Code)
-│   ├── 01_prepare_data.ipynb       # CMS API pull, cleaning, quality audit, SQLite
-│   ├── 02_exploration.ipynb        # EDA: distributions, specialties, retention target
+│   ├── 01_exploration.ipynb        # EDA: load raw data, observe, and preparation decisions
+│   ├── 02_preparation.ipynb        # apply the decisions: clean, aggregate, retention target
 │   ├── 03_modeling.ipynb           # retention model, SHAP, segmentation, fairness
 │   └── 04_genai_assistant.ipynb    # text-to-SQL assistant
 ├── src/
