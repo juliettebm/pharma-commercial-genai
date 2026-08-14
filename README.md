@@ -36,6 +36,10 @@ pharma-commercial-genai/
 │
 ├── data/
 │   └── README.md                   # data source and download notes (raw data not versioned)
+├── notebooks/                      # interactive analysis (open, run and modify in Jupyter/VS Code)
+│   ├── 01_prepare_data.ipynb
+│   ├── 02_modeling.ipynb
+│   └── 03_genai_assistant.ipynb
 ├── src/
 │   ├── 01_prepare_data.py          # pull from CMS API, clean, quality audit, build SQLite
 │   ├── 02_modeling.py              # retention model, SHAP, segmentation, fairness check
@@ -82,6 +86,8 @@ streamlit run src/dashboard.py                  # interactive dashboard
 ```
 
 The GenAI assistant needs a local LLM. Install Ollama, run `ollama pull llama3.2`, and keep the app running (or set `LLM_PROVIDER=openai` with an API key).
+
+The same steps are available as interactive notebooks in [`notebooks/`](notebooks/) (01 to 03), to open, run and modify in Jupyter or VS Code.
 
 ---
 
