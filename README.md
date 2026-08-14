@@ -1,80 +1,48 @@
 # 💊 Pharma Commercial Analytics + GenAI
 
 [![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)](https://www.python.org/)
-[![scikit-learn](https://img.shields.io/badge/scikit--learn-modeling-orange?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
-[![LangChain](https://img.shields.io/badge/LangChain-GenAI-1C3C3C?logo=langchain&logoColor=white)](https://www.langchain.com/)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-Random%20Forest-orange?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+[![LangChain](https://img.shields.io/badge/LangChain-text--to--SQL-1C3C3C?logo=langchain&logoColor=white)](https://www.langchain.com/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-dashboard-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-End-to-end commercial data science on real pharmaceutical marketing data (CMS Open Payments): predictive modeling of HCP engagement, a natural-language analytics assistant (text-to-SQL + insight narration), an interactive dashboard, and a responsible-AI layer.
-
-> Status: complete (data pipeline, retention model, GenAI assistant, dashboard, model card).
+End-to-end commercial data science on real pharmaceutical marketing data (CMS Open Payments): HCP retention modeling with SHAP, engagement segmentation, a GenAI text-to-SQL assistant, an interactive dashboard, and a responsible-AI model card.
 
 ---
 
 ## Objective
 
-Pharmaceutical companies spend heavily engaging healthcare professionals (HCPs): consulting fees, speaking, meals, travel, education. Commercial teams need to:
+Pharmaceutical companies spend heavily engaging healthcare professionals (HCPs). Commercial teams need to understand and segment that engagement, predict which HCPs stay engaged from one year to the next, let non-technical stakeholders explore the data in plain language, and do all of it under responsible-AI constraints.
 
-- **understand and segment** that engagement,
-- **predict** which HCPs stay engaged from one year to the next (retention),
-- let **non-technical stakeholders** explore the data in plain language,
-- all under **responsible-AI** constraints (transparency, fairness, governance).
-
-This project builds a compact end-to-end system on public data that mirrors the missions of a pharma Commercial Data Science role.
+This project builds a compact end-to-end system on public data that mirrors the missions of a pharma Commercial Data Science role: cleaning and structuring, predictive modeling and evaluation, GenAI and conversational analytics, data storytelling, and AI governance.
 
 ---
 
-## Data
+## Dataset
 
-**CMS Open Payments** (US, public): industry payments and transfers of value to physicians and teaching hospitals. One row per payment (recipient, specialty, state, manufacturer, amount, nature, date). See [`data/README.md`](data/README.md) for how to download a manageable slice.
-
-The raw data is not versioned (see `.gitignore`).
-
----
-
-## Components (mapped to the role's missions)
-
-| Mission | Deliverable |
-| --- | --- |
-| IA / GenAI, conversational AI, analysis tools | `src/03_genai_assistant.py` : text-to-SQL assistant + LLM insight narrator |
-| Preparation, modeling, evaluation of commercial data | `src/02_modeling.ipynb` : HCP retention model, baseline, metrics |
-| Collection, cleaning, structuring, quality | `src/01_prepare_data.py` : cleaning + relational SQLite + quality audit |
-| Predictive / ML models | HCP retention (XGBoost / Random Forest) + segmentation (k-means) |
-| Data visualization + storytelling | `src/dashboard.py` : Streamlit dashboard + auto-generated narrative |
-| Responsible AI | `responsible_ai/model_card.md` : SHAP transparency, bias check, governance, GDPR note |
+- **Source**: CMS Open Payments (US), public. General Payments.
+- **Scope**: West Virginia, program year 2022 (features) to 2023 (retention target).
+- **Size**: 5,707 HCPs; 186,223 raw payments across the two years.
+- **Base rate**: 73.3% retention.
+- **Access**: pulled automatically from the CMS data API by `src/01_prepare_data.py` (no manual download). The raw data and the SQLite database are not versioned (see `.gitignore`).
+- **Known data-quality gap**: manufacturer names are not normalised ("ABBVIE INC." and "AbbVie Inc." coexist), which biases company-level aggregation. Flagged for governance.
 
 ---
 
-## Predictive task
-
-**HCP retention (churn).** From a physician's year-N engagement profile (specialty, state, number of distinct manufacturers, payment-type mix, number of interactions), predict whether they will still receive any industry payment in year N+1. A clean, leakage-aware commercial target, complemented by an unsupervised **segmentation** of engagement profiles.
-
----
-
-## Results
-
-Scope: West Virginia, 2022 to 2023, 5,707 HCPs, 73.3% retention.
-
-- **Retention model**: ROC-AUC **0.807** (majority baseline 0.500), PR-AUC 0.922. Main drivers (feature importance and SHAP agree): number of payments, number of manufacturers, total amount. Retention is driven by engagement intensity, not specialty.
-- **Segmentation** (k-means, 4 profiles): a loyal core (76 payments per HCP, 98% retention), a high-value group, a large low-touch group, and a minimal-contact group that churns most (56% retention).
-- **Fairness**: strong and consistent for the large groups (physicians and PA/APN, AUC around 0.80) but markedly weaker for Dental Providers (AUC 0.633), so predictions are not applied uniformly. See the model card.
-- **GenAI assistant**: natural-language questions are translated to SQL over a semantic view and answered (for example "how many HCPs in 2023?" returns 6,230). A small local model (llama3.2) keeps it free but imperfect, an explicit cost / reliability trade-off.
-
----
-
-## Structure
+## Project Structure
 
 ```
 pharma-commercial-genai/
-├── data/                       # Open Payments slice (not versioned) + download guide
+│
+├── data/
+│   └── README.md                   # data source and download notes (raw data not versioned)
 ├── src/
-│   ├── 01_prepare_data.py      # clean + structure into SQLite, quality audit
-│   ├── 02_modeling.ipynb       # retention model + segmentation + evaluation + SHAP
-│   ├── 03_genai_assistant.py   # text-to-SQL + insight narrator (local LLM)
-│   └── dashboard.py            # Streamlit: KPIs + model + SHAP + assistant
+│   ├── 01_prepare_data.py          # pull from CMS API, clean, quality audit, build SQLite
+│   ├── 02_modeling.py              # retention model, SHAP, segmentation, fairness check
+│   ├── 03_genai_assistant.py       # text-to-SQL assistant over a semantic view
+│   └── dashboard.py                # Streamlit: KPIs, segments, model, assistant
 ├── responsible_ai/
-│   └── model_card.md
+│   └── model_card.md               # metrics, fairness, ethics, governance, GDPR
 ├── requirements.txt
 ├── .gitignore
 └── README.md
@@ -82,15 +50,98 @@ pharma-commercial-genai/
 
 ---
 
+## Reproduce
+
+### 1. Clone
+
+```bash
+git clone https://github.com/juliettebm/pharma-commercial-genai.git
+cd pharma-commercial-genai
+```
+
+### 2. Install
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate            # Linux/macOS: source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 3. Build the dataset (CMS API)
+
+```bash
+python src/01_prepare_data.py       # downloads a state slice and builds data/openpayments.sqlite
+```
+
+### 4. Model, assistant, dashboard
+
+```bash
+python src/02_modeling.py                       # retention model + SHAP + segmentation + fairness
+python src/03_genai_assistant.py "Combien de professionnels de sante en 2023 ?"
+streamlit run src/dashboard.py                  # interactive dashboard
+```
+
+The GenAI assistant needs a local LLM. Install Ollama, run `ollama pull llama3.2`, and keep the app running (or set `LLM_PROVIDER=openai` with an API key).
+
+---
+
+## Methodology
+
+1. **Data preparation**: paginated pull from the CMS data API for one state and two years, cleaning, quality audit, aggregation to an HCP engagement profile, and a relational SQLite database.
+2. **Retention model**: Random Forest predicting whether an HCP engaged in year N is still engaged in year N+1. Temporal separation of features and target avoids leakage.
+3. **Explainability**: SHAP values on top of feature importances.
+4. **Segmentation**: k-means on engagement profiles.
+5. **GenAI assistant**: a natural-language question is translated to SQL over a semantic view with short column names, executed, and narrated. Guardrails allow SELECT only.
+6. **Responsible AI**: fairness sliced by specialty, plus a model card covering governance and GDPR.
+
+---
+
+## Key Results
+
+Scope: West Virginia, 2022 to 2023, 5,707 HCPs, 73.3% retention.
+
+| Metric | Value |
+| --- | --- |
+| ROC-AUC (Random Forest) | **0.807** |
+| ROC-AUC (majority baseline) | 0.500 |
+| PR-AUC | 0.922 |
+
+Main drivers (feature importance and SHAP agree): number of payments, number of manufacturers, total amount. Retention is driven by engagement intensity, not specialty.
+
+**Engagement segments (k-means):**
+
+| Segment | HCPs | Mean amount | Mean payments | Retention |
+| --- | ---: | ---: | ---: | ---: |
+| Loyal core | 679 | $2,437 | 76 | **98%** |
+| High value | 267 | $19,149 | 32 | 81% |
+| Low touch | 4,592 | $209 | 6 | 70% |
+| Minimal contact | 169 | $172 | 1.6 | **56%** |
+
+**Fairness (AUC by specialty):** strong for the large groups (physicians 0.808, PA/APN 0.802) but markedly weaker for Dental Providers (**0.633**), so predictions are not applied uniformly.
+
+---
+
 ## Responsible AI
 
-Profiling HCPs by commercial value raises real questions, so the project treats them explicitly: model transparency via **SHAP**, a **fairness check** across specialties and regions, documented **limitations and leakage controls**, and a **data-governance / GDPR** note. Summarised in a **model card**.
+Profiling HCPs by commercial value is sensitive, so the project treats it explicitly: SHAP transparency, a fairness slice that surfaced the Dental Providers gap, documented limitations and leakage controls, and a data-governance / GDPR note. Summarised in [`responsible_ai/model_card.md`](responsible_ai/model_card.md).
+
+---
+
+## Disclaimer
+
+Educational proof-of-concept on public data concerning real individuals (physicians). Used for analysis and demonstration only, not for individual targeting decisions.
 
 ---
 
 ## Stack
 
-Python 3.11 · pandas · scikit-learn · XGBoost · SHAP · SQLite · LangChain · Streamlit · Ollama / OpenAI
+Python 3.11 · pandas · scikit-learn · SHAP · SQLite · LangChain · Streamlit · Ollama / OpenAI
+
+---
+
+## License
+
+Released under the [MIT License](LICENSE).
 
 ---
 
