@@ -1,0 +1,16 @@
+pandas>=1.5
+numpy>=1.23
+scikit-learn>=1.2
+xgboost>=2.0
+shap>=0.44
+matplotlib>=3.6
+seaborn>=0.12
+streamlit>=1.30
+jupyterlab>=4.0
+requests>=2.28
+python-dotenv>=1.0
+# GenAI (assistant text-to-SQL + narrateur) :
+langchain>=0.3
+langchain-community>=0.3
+langchain-ollama>=0.2
+langchain-openai>=0.2

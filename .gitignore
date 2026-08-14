@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+.ipynb_checkpoints/
+# Donnees brutes et base locale (non versionnees) :
+data/*.csv
+data/*.zip
+data/*.sqlite
+data/*.db
+!data/README.md
+# Artefacts modeles :
+*.joblib
+*.pkl
